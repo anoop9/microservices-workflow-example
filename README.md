@@ -1,14 +1,13 @@
 # Introduction
 
-This is an order fulfillment workflow example project, containing 3 subprojects, normal spring-boot project, same example project using temporal workflow framework (https://temporal.io/) and same example project using Netflix conductor (https://conductor.netflix.com/. The idea is you get a feeling/example of how to use these workflow frameworks with a simple Spring boot example project.
+This is a microservices workflow orchestration example project in Java (spring-boot) for a simple order fulfillment flow.  It contains 3 subprojects, normal spring-boot project, same example project using temporal workflow framework (https://temporal.io/) and same example project using Netflix conductor (https://conductor.netflix.com/). The idea is you get a feeling/example of how to use these workflow frameworks with a simple Spring boot example project.
 
 1) A simple order fulfillment microservices project in spring-boot containing three microservices (order-svc, payment-svc and shipment-svc): check folder - **_order-fullfillment-workflow_** 
-2) The same spring-boot project using Temporal:**_order-fullfillment-workflow_temporal_**
-3) The same spring-boot project using Netflix conductor:**_order-fullfillment-workflow_conductor_**
+2) The same spring-boot project using Temporal: **_order-fullfillment-workflow_temporal_**
+3) The same spring-boot project using Netflix conductor: **_order-fullfillment-workflow_conductor_**
 
 
-
-The way how these microservices
+You create an order, debit payment for order, ship the order and finally mark the order as completed. We are using three different microservices for this. The way how these microservices
 interact is depicted in the following diagram. ![Alt text](orderfullfillment.png?raw=true "order fulfillment workflow")
 
 1) User initiate a checkout via UI (simulated as a REST endpoint call by creating a new order)
