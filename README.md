@@ -1,13 +1,23 @@
 # Introduction
 
-This is an order fulfillment workflow example project, containing 3 microservices in spring-boot. The way how these microservices
+This is an order fulfillment workflow example project, containing 3 subprojects, normal spring-boot project, same example project using temporal workflow framework (https://temporal.io/) and same example project using Netflix conductor (https://conductor.netflix.com/. The idea is you get a feeling/example of how to use these workflow frameworks with a simple Spring boot example project.
+
+1) A simple order fulfillment microservices project in spring-boot containing three microservices (order-svc, payment-svc and shipment-svc): check folder - **_order-fullfillment-workflow_** 
+2) The same spring-boot project using Temporal:**_order-fullfillment-workflow_temporal_**
+3) The same spring-boot project using Netflix conductor:**_order-fullfillment-workflow_conductor_**
+
+
+
+The way how these microservices
 interact is depicted in the following diagram. ![Alt text](orderfullfillment.png?raw=true "order fulfillment workflow")
 
-1) User initiate a checkout via UI
-2) Order-svc (order microservice) create an order, with initially order status as 'PENDING'
+1) User initiate a checkout via UI (simulated as a REST endpoint call by creating a new order)
+2) Order-svc (order microservice) receive new request to create an order, and creates one with initially order status as 'PENDING'
 3) Order microservice initiate the workflow/business process flow - by debiting payment for the order via calling payment-svc (Payment microservice) and sending order (OrderDTO) details
 4) Order microservice does the second step in workflow which is shipping the order by calling shipment-svc (Shipment microservice) and sending order (OrderDTO) details
 5) After both steps are completed, order-svc complete the order by setting order status as 'COMPLETED' and saving it. 
+
+The above is the general flow of the creating an order, which is going to be also demonstrated with the workflow frameworks temporal and conductor. Look at the respective subprojects and their **README** to see those framework specific code changes, installation steps and ways in which they differ in creating a workflow and starting the workflow.
 
 ## Modules
 
@@ -58,7 +68,7 @@ or
 ```
 
 
-## To Test/ start workflow execution
+## To start workflow execution
 
 ```commandline
 curl --location --request POST 'localhost:8081/orders' \
@@ -70,6 +80,7 @@ curl --location --request POST 'localhost:8081/orders' \
 }'
 ```
 
+## Optional: To test individual microservices and check if they accepted an order
 To get an order based on id and know its status
 ```commandline
 curl --location --request GET 'localhost:8081/orders/1' \

@@ -1,12 +1,13 @@
 # Introduction
 
-This is an order fulfillment workflow example project, containing 3 microservices in spring-boot and one of the microservices (order-svc) integrated with Netflix Conductor client for Workflow orchestration. The way how these microservices
+This is an order fulfillment workflow example project, containing 3 microservices in spring-boot  and one of the microservices (order-svc) integrated with Netflix Conductor client for Workflow orchestration. The way how these microservices
 interact is depicted in the following diagram. ![Alt text](pics/orderfullfillment.png?raw=true "order fulfillment workflow")
 
-1) User initiate a checkout via UI
+1) User initiate a checkout via UI (simulated as a REST endpoint call for our testing purpose by creating a new order using POST operation)
 2) Order-svc (order microservice) create an order, with initially order status as 'PENDING'
-3) Order microservice initiate the workflow/business process flow - by debiting payment for the order via calling payment-svc (Payment microservice) and sending order (OrderDTO) details
-4) Order microservice does the second step in workflow which is shipping the order by calling shipment-svc (Shipment microservice) and sending order (OrderDTO) details
+3) Order microservice initiate the workflow/business process flow by starting the workflow using Netflix conductor client library - The workflow has two tasks - debiting payment and shpping the order
+4) First task in workflow (HTTP task in Netflix conductor) get executed by debiting payment for the order via calling payment-svc (Payment microservice) and sending order (OrderDTO) details
+5)Second task in workflow (HTTP task in Netflix conductor) gets executed which is shipping the order by calling shipment-svc (Shipment microservice) and sending order (OrderDTO) details
 5) After both steps are completed, order-svc complete the order by setting order status as 'COMPLETED' and saving it. 
 
 ## Modules
@@ -28,6 +29,7 @@ Code is organized in the packages as below.
 - common: common configuration such as Spring bean definition,
 - persistence: Spring JPA related code.
 - resource: REST API specific implementation and request and response mappers.
+- conductor: has netflix conductor specific worker classes for starting a 'Task' in the workflow 
 
 ### payment-svc (Payment Microservice)
 
@@ -44,9 +46,16 @@ Contains implementation `ShipOrderServiceImpl`  which ship the order based on Or
 ![Alt text](pics/conductordocker.png?raw=true "docker compose changes")
 4) Start conductor by `docker-compose up -d`. You can find the conductor UI at http://localhost:5000/ and the swagger endpoint at http://localhost:8080/
 
-# Build and Run
+# Test create a workflow in Conductor
+There are three separate curl request examples provided here in files - taskdef-curl, workflow-curl and testingworkflow-curl.
+1) To create Conductor tasks - use the **taskdef-curl** file and POST that request. Make sure in the conductor UI, go to Tab ->Definitions->Tasks and you can find two new tasks - "http_task_debit_order_payment" and "http_task_ship_order". (NB: You can notice that due to MAC specific issues for docker, I have to provide task "uri": "http://host.docker.internal:8083/payments/debit" instead of http://localhost:8083/payments/debit)
+2) To create Conductor Workflow which calls the previous tasks created - use the **workflow-curl** file and POST that request. Make sure in the conductor UI, go to Tab ->Definitions->Workflows and you can find one new workflow - "order_fullfillment_workflow".
+3) Now you can test workflow by triggering manually using a curl request as given in **testingworkflow-curl** file (but to do this you have the microservices also running, which is explained in next section -**Build and Run Microservices**). You should be able to see a screen like this, if workflow is executed successfully
+   ![Alt text](pics/workflow-example.png?raw=true "workflow executed manually")
 
-Make sure you have JDK 17 and gradle installed.
+# Build and Run Microservices
+
+Make sure you have JDK 17 or higher and gradle installed.
 
 To build `./gradlew clean build`
 
@@ -80,16 +89,11 @@ docker build -t order-svc:latest .
 docker run -d -p 8081:8081 --name order-svc order-svc
 ```
 
-# Test the workflow Manually
-There are three separate curl request examples provided here in files - taskdef-curl, workflow-curl and testingworkflow-curl.
-1) To create Conductor tasks - use the **taskdef-curl** file and POST that request. Make sure in the conductor UI, go to Tab ->Definitions->Tasks and you can find two new tasks - "http_task_debit_order_payment" and "http_task_ship_order"
-2) To create Conductor Workflow which calls the previous tasks created - use the **workflow-curl** file and POST that request. Make sure in the conductor UI, go to Tab ->Definitions->Workflows and you can find one new workflow - "order_fullfillment_workflow".
-3) Now you can test workflow by triggering manually using a curl request as given in **testingworkflow-curl** file. You should be able to see a screen like this, if workflow is executed successfully
-![Alt text](pics/workflow-example.png?raw=true "workflow executed manually")
 
 
 
-## To Test/ start workflow execution by creating an Order
+
+## To Test/ start workflow execution by creating a new Order
 
 ```commandline
 curl --location --request POST 'localhost:8081/orders' \
