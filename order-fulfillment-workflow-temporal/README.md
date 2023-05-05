@@ -1,6 +1,6 @@
 # Introduction
 
-This is an order fulfillment workflow example project, containing 3 microservices in spring-boot. The way how these
+This is an order fulfillment workflow example project, containing 3 microservices in spring-boot and these microservices integrated with Temporal either to create/start a workflow (order-svc) or to start activities in workflow (payment-svc and shipment-svc). The way how these
 microservices
 interact is depicted in the following diagram. ![Alt text](orderfullfillment.png?raw=true "order fulfillment workflow")
 
