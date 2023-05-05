@@ -1,0 +1,19 @@
+plugins {
+    id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+    id 'java'
+}
+
+repositories {
+    mavenCentral()
+}
+
+subprojects {
+    group = 'com.infor.sra'
+    repositories {
+        mavenCentral()
+    }
+    compileJava {
+        sourceCompatibility = 17
+        targetCompatibility = 17
+    }
+}

@@ -1,0 +1,12 @@
+curl --location --request POST 'http://localhost:8080/api/workflow' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+    "name": "order_fullfillment_workflow",
+    "version": 1,
+    "input": {
+         "orderId": 5,
+         "productId": 555,
+         "price": 44.99,
+         "quantity": 1
+    }
+}'

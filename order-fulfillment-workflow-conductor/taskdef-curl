@@ -1,0 +1,70 @@
+curl --location --request POST 'http://localhost:8080/api/metadata/taskdefs' \
+--header 'Content-Type: application/json' \
+--data-raw '[
+    {
+          "name": "http_task_debit_order_payment",
+          "taskReferenceName": "http_task_debit_order_payment_ref",
+          "inputParameters": {
+            "http_request": {
+              "uri": "http://host.docker.internal:8083/payments/debit",
+              "method": "POST",
+              "connectionTimeOut": 3000,
+              "readTimeOut": "3000",
+              "accept": "application/json",
+              "contentType": "application/json",
+              "body": {
+                "orderId": "${workflow.input.orderId}",
+                "productId": "${workflow.input.productId}",
+                "price": "${workflow.input.price}",
+                "quantity": "${workflow.input.quantity}"
+              }
+            }
+          },
+          "outputKeys": [
+                 "orderId"
+          ],
+          "type": "HTTP",
+                "startDelay": 0,
+                "optional": false,
+                "asyncComplete": false,
+                "retryCount": 2,
+                "retryLogic": "FIXED",
+                "retryDelaySeconds": 10,
+                 "timeoutPolicy": "TIME_OUT_WF",
+                 "responseTimeoutSeconds": 180,
+                 "ownerEmail": "anoop.ambooken@infor.com"
+        },
+        {
+          "name": "http_task_ship_order",
+          "taskReferenceName": "http_task_ship_order_ref",
+          "inputParameters": {
+            "http_request": {
+              "uri": "http://host.docker.internal:8084/shipments/ship",
+              "method": "POST",
+              "connectionTimeOut": 3000,
+              "readTimeOut": "3000",
+              "accept": "application/json",
+              "contentType": "application/json",
+              "body": {
+                "orderId": "${workflow.input.orderId}",
+                "productId": "${workflow.input.productId}",
+                "price": "${workflow.input.price}",
+                "quantity": "${workflow.input.quantity}"
+              }
+            }
+          },
+          "outputKeys": [
+                 "orderId"
+          ],
+          "type": "HTTP",
+                          "startDelay": 0,
+                          "optional": false,
+                          "asyncComplete": false,
+                          "retryCount":2,
+                          "retryLogic": "FIXED",
+                          "retryDelaySeconds": 10,
+                           "timeoutPolicy": "TIME_OUT_WF",
+                           "responseTimeoutSeconds": 180,
+                           "ownerEmail": "anoop.ambooken@infor.com"
+        }
+  ]'
